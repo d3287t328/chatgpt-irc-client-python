@@ -29,7 +29,7 @@ logger = logging.getLogger()
 def connect(server, port, usessl, password, ident, realname, nickname, channels):
     while True:
         try:
-            logger.info("Connecting to: " + server)
+            logger.info(f"Connecting to: {server}")
             irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if usessl:
                 context = ssl.create_default_context()
@@ -48,8 +48,7 @@ def connect(server, port, usessl, password, ident, realname, nickname, channels)
 
 def process_message(data):
     try:
-        message = data.split("PRIVMSG", 1)[1].split(":", 1)[1].strip()
-        return message
+        return data.split("PRIVMSG", 1)[1].split(":", 1)[1].strip()
     except IndexError:
         return ""
 
@@ -82,11 +81,9 @@ irc = connect(server, port, usessl, password, ident, realname, nickname, channel
 # Listen for messages from users
 while True:
     try:
-        data = irc.recv(4096).decode("UTF-8")
-        if data:
+        if data := irc.recv(4096).decode("UTF-8"):
             logger.info(data)
-            message = process_message(data)
-            if message:
+            if message := process_message(data):
                 response = generate_response(message)
                 send_response(irc, channels[0], response)  # Change the channel as per your requirement
     except UnicodeDecodeError:
